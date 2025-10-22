@@ -1,0 +1,2 @@
+The three databases are taken from a kaagle dataset containing three big files one with International Sales, Amazon (National Sales), and description of products 
+All of these were then combined in a knowledge graph in order to be able to capture their most vital information and be able to serve users with specific products from both catalogues
