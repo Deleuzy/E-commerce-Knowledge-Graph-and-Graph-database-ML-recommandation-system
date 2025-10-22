@@ -1,4 +1,4 @@
-# Here I have the top k recommandations for the no discount one 
+# Here I have the top k recommandations for the no discount one where I simulate random dates to simulate how it might be in production
 
 # === xgb_temporal_diverse_fixed.py ===
 # Fixed version matching your 134-feature XGBoost model
