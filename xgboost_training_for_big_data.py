@@ -1,5 +1,47 @@
 # Here I have the code that trains both the discount and no discount model after every data injection, this does it so plus imputes feature importance and a classification report
 
+
+# Generate new negative and positive links before the overall caluclation begings
+
+def extract_new_links(G):
+    """Extract positive customer-product links from graph."""
+    positive_links = set()
+
+    # Case 1: Direct Customer → Product (PURCHASED)
+    for u, v, data in G.edges(data=True):
+        if G.nodes[u].get('label') == 'Customer' and G.nodes[v].get('label') == 'Product':
+            if data.get('type') == 'PURCHASED':
+                positive_links.add((u, v))
+
+    # Case 2: Through Order: Customer → Order → Product
+    for u, v, data in G.edges(data=True):
+        if data.get('type') == 'PURCHASED' and G.nodes[v].get('label') == 'Order':
+            for _, p, ed in G.edges(v, data=True):
+                if ed.get('type') == 'CONTAINS' and G.nodes[p].get('label') == 'Product':
+                    positive_links.add((u, p))
+
+    return positive_links
+
+
+def generate_new_negative_samples(G, positive_links):
+    """Generate negative samples by sampling random (customer, product) pairs not in positive_links."""
+    all_customers = [n for n, d in G.nodes(data=True) if d.get('label') == 'Customer']
+    all_products = [n for n, d in G.nodes(data=True) if d.get('label') == 'Product']
+
+    negative_links = set()
+    max_attempts = len(positive_links) * 10
+    attempts = 0
+
+    while len(negative_links) < len(positive_links) and attempts < max_attempts:
+        c = random.choice(all_customers)
+        p = random.choice(all_products)
+        if (c, p) not in positive_links:
+            negative_links.add((c, p))
+        attempts += 1
+
+    return negative_links
+
+
  # === enhanced_xgb_training_stable.py ===
 import networkx as nx
 import pandas as pd
